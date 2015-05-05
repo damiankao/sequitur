@@ -1,0 +1,331 @@
+<html>
+  <head>
+    <title>Sequitur</title>
+    <script type="text/javascript" src="js/d3.v3.min.js"></script>
+    <script type="text/javascript" src="js/crossfilter.min.js"></script>
+    <script type="text/javascript" src="js/mousetrap.min.js"></script>
+    <script type="text/javascript" src="js/sequitur.js"></script>
+    <script src="js/react-with-addons.min.js"></script>
+    <script src="js/JSXTransformer.js"></script>
+    <script src="js/socket.io-1.3.4.js"></script>
+    <style>
+      body {
+        margin:0px;
+        overflow:hidden;
+        font-family:arial;
+      }
+
+      .menuList {
+        margin:0;
+        padding:0;
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        list-style-type:none;
+        background:#31343B;
+        height:35px;
+        border-bottom:5px solid #DB7332;
+      }
+
+      .menuList li {
+        padding:0 10 0 10;
+        display:inline-block;
+        margin-left:20px;
+        letter-spacing:5px;
+        color:#F2F2F2;
+        font-size:13px;
+        line-height:35px;
+        height:35px;
+      }
+
+      .menuList li:hover {
+        color:white;
+        cursor:pointer;
+      }
+
+      .blastPanel {
+        background:#31343B;;
+      }
+
+      .blastPanel textarea {
+        margin-top:20px;
+        margin-left:20px;
+        border:none;
+        font-size:12px;
+        font-family:courier;
+      }
+
+      .blastPanel input[type=radio] {
+        width:13px;
+        height:13px;
+        margin-right:5px;
+      }
+
+      .blastRadio {
+        margin-top:8px;
+        letter-spacing:3px;
+        margin-left:20px;
+      }
+
+      .blastButton {
+        text-align:center;
+        letter-spacing:5px;
+        background:#292C33;
+        line-height:30px;
+        height:50px;
+        padding:10 0 10 0;
+      }
+
+      .blastButton:hover {
+        color:#C4C4C4;
+        cursor:pointer;
+      }
+
+      .blastPanel label {
+        font-size:13px;
+        margin-right:20px;
+      }
+
+      .blastResultPanel {
+        position:absolute;
+        padding:20px;
+        background:white;
+        overflow:auto;
+        color:black;
+      }
+
+      .blastJobStatus {
+        padding:3 5 3 5px;
+        font-size:12px;
+        color:white;
+        border-radius:3px;
+        line-height:12px;
+        letter-spacing:1px;
+        display:inline-block;
+      }
+
+      .blastTable {
+        margin-bottom:20px;
+        font-size:13px;
+        border-collapse:collapse;
+      }
+
+      .blastRefName {
+        display:inline;
+        font-size:11px;
+        color:#5C6D91;
+        margin-left:10px;
+      }
+
+      .blastFirstColumn {
+        width:300px;
+      }
+
+      .blastRefName:hover {
+        cursor:pointer;
+        color:#38486B;
+      }
+
+      .spine {
+        height:5px;
+        background:#636363;
+        margin-bottom:5px;
+        border:0px;
+      }
+
+      .spineSVG {
+        height:4px;
+      }
+
+      .targetRow {
+        margin-top:20px;
+        font-size:13px;
+        background:#4A505C;
+        padding:10 0 10 0;
+      }
+
+      .targetRow div {
+        margin-left:20px;
+      }
+
+      .targetRow input {
+        margin-right:8px;
+      }
+
+      .targetPrograms, .targetName, .targetDescription {
+        margin-top:5px;
+      }
+
+      .targetName {
+        font-weight:bold;
+        font-size:14px;
+      }
+
+      .targetDescription {
+        font-style:italic;
+      }
+
+      .sidePanel {
+        background:#31343B;
+        color:white;
+        overflow:hidden;
+        position:absolute;
+      }
+
+      .titlePanel {
+        padding:10px;
+        text-align:center;    
+        background:#DB7332;
+        color:white;
+        height:20px;
+        font-size:16px;
+        letter-spacing:5px;
+        font-family:verdana;
+      }
+
+      .titlePanel:hover {
+        cursor:pointer;
+      }
+
+      .subtitlePanel {
+        padding:10px;
+        text-align:center;    
+        font-weight:bold;  
+        color:#ABB7D1;
+        height:15px;
+        font-size:12px;
+        letter-spacing:3px;
+      }
+
+      .trackInfo {
+        margin-bottom:10px;
+        padding:8px;
+        padding-left:25px;
+        color:white;
+      }
+
+      .trackInfo:hover {
+        background:#4A505C;
+        cursor:move;
+      }
+
+      .tracksubInfo {
+        font-size:13px;
+        color:#B8C5E3;
+      }
+
+      .trackColorbox {
+        font-weight:bold;
+        padding-top:6px;
+        font-size:11px;
+        color:#BAC8E8;
+        text-align:center;
+      }
+
+      .trackColorbox:hover {
+        cursor:pointer;
+      }
+
+      .feat_tupleKey {
+        font-size:12px;
+        color:#B5C5EB;
+        letter-spacing:1px;
+        margin-bottom:3px;
+        font-weight:bold;
+        margin-left:10px;
+      }
+
+      .feat_tupleValue{
+        font-size:14px;
+        margin-left:15px;
+      }
+
+      .feat_table {
+        color:white;
+        font-size:11px;
+        margin-left:15px;
+      }
+
+      td {
+        padding:5 10 5 10px;
+      }
+
+      .feat_info {
+        margin-bottom:10px;
+        margin-right:10px;
+      }
+
+      .browserChangeRef {
+        float:right;
+        letter-spacing:0px;
+        font-size:11px;
+        margin-right:20px;
+        border-radius:3px;
+        padding:5 10 5 10px;
+        background:#31343B;
+      }
+
+      .browserChangeRef:hover {
+        background:#4A505C;
+      }
+
+      .browserRefInput {
+        font-size:13px;
+        border:0px;
+      }
+
+      .loader {
+        top:-45;
+        margin: 6em auto;
+        font-size: 2px;
+        position: relative;
+        text-indent: -9999em;
+        border-top: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-right: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-bottom: 1.1em solid rgba(255, 255, 255, 0.2);
+        border-left: 1.1em solid #ffffff;
+        -webkit-transform: translateZ(0);
+        -ms-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-animation: load8 1.1s infinite linear;
+        animation: load8 1.1s infinite linear;
+      }
+      .loader,
+      .loader:after {
+        border-radius: 50%;
+        width: 10em;
+        height: 10em;
+      }
+      @-webkit-keyframes load8 {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          -webkit-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes load8 {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          -webkit-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+
+
+    </style>
+  </head>
+  <body>
+    <div id = 'app'></div>
+	<div id = 'browser'></div>
+
+    <script type="text/jsx" src="app.jsx"></script>
+  </body>
+</html>
+

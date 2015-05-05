@@ -1,0 +1,88 @@
+#!/usr/bin/env python 
+
+import os, subprocess, sys, signal
+
+def run(args):
+	args.insert(0,'./deploy')
+	p = subprocess.Popen(args)
+	return p.pid
+
+def start(cmds):
+	pidFile = open(os.getcwd() + '/sequitur.pid')
+	pids = map(int,pidFile.read().strip().split())
+	pidFile.close()
+
+	if len(pids) > 0:
+		print "Sequitur is already running, stop the processes first or use the restart command"
+		sys.exit()
+		
+	pids = [run(cmd.split()) for cmd in cmds]
+	open(os.getcwd() + '/sequitur.pid','w').write(' '.join(map(str, pids)))
+
+def stop():
+	pidFile = open(os.getcwd() + '/sequitur.pid')
+	pids = map(int,pidFile.read().strip().split())
+	pidFile.close()
+
+	for pid in pids:
+		os.kill(pid, signal.SIGTERM)
+
+	open(os.getcwd() + '/sequitur.pid','w')
+
+if len(sys.argv) == 1:
+	print 'usage'
+	sys.exit()
+
+action = sys.argv[1]
+
+if action == 'config':
+	pass
+else:
+	configPath = os.getcwd() + '/sequitur.config'
+	configFile = open(configPath)
+
+	keyLine = ''
+	dataLine = ''
+
+	config = {}
+
+	for line in configFile:
+		if line[0] != '#':
+			if line[0] == '>':
+				keyLine = line[1:].strip()
+				break
+
+	for line in configFile:
+		if line[0] != '#':
+			if line[0] == '>':
+				config[keyLine] = dataLine.strip()
+				keyLine = line[1:].strip()
+				dataLine = ''
+			else:
+				dataLine += line
+
+	config[keyLine] = dataLine
+
+	cmd_static = "static {} -d {}".format(config['static_port'], os.path.abspath(config['static_path']))
+	cmd_sparseRef = "sparseRef {} -d {} -i {}".format(config['start_port'], os.path.abspath(config['sparse_db']), os.path.abspath(config['sparse_index']))
+	config['start_port'] = str(int(config['start_port']) + 1)
+	cmd_feature = "feature {} -d {} -i {}".format(config['start_port'], os.path.abspath(config['feature_db']), os.path.abspath(config['feature_index']))
+	config['start_port'] = str(int(config['start_port']) + 1)
+	cmd_blast = "blast {} -c {} -b {} -t {} -j {}".format(config['start_port'], os.path.abspath(configPath), os.path.abspath(config['blast_bin']), config['blast_threadsPerJob'], config['blast_jobsMax'])
+	config['start_port'] = str(int(config['start_port']) + 1)
+
+	cmds = [cmd_static, cmd_sparseRef, cmd_feature, cmd_blast]
+
+	if action == 'start':
+		if int(config['static_port']) < 130:
+			if os.getuid() != 0:
+				print 'To run the static server on lower ports (80 or less than 128), you must have root privileges'
+				sys.exit()
+
+		start(cmds)
+	elif action == 'stop':
+		stop()
+	elif action == 'restart':
+		stop()
+		start(cmds)
+

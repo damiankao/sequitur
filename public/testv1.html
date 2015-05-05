@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			.nodeClosed {
+				width: 10px; 
+				height: 10px; 
+				background: #545454;
+				display:inline-block;
+				margin-right:3px;
+			}
+
+			.nodeOpen {
+				width: 10px; 
+				height: 10px; 
+				display:inline-block;
+				background: #828282;
+				margin-right:3px;
+				border-radius:2px;
+			}
+
+			.nodeOpen:hover {
+				background: #3D3D3D;
+				cursor:pointer;
+			}
+
+			.nodeClosed:hover {
+				background: #3D3D3D;
+				cursor:pointer;
+			}
+
+			.nodeSelected {
+				display:inline-block;
+				font-weight:bold;
+				line-height:20px;
+				margin-top:12px;
+			}
+
+			.nodeSelected:hover {
+				cursor:pointer;
+			}
+
+			.nodeNotSelected {
+				display:inline-block;
+				font-weight:normal;
+				line-height:20px;
+				margin-top:12px;
+			}
+
+			.nodeNotSelected:hover {
+				cursor:pointer;
+			}
+
+			.treeList {
+				font-family:Arial;
+				font-size:14px;
+				list-style-type:none;
+				clear:both;
+				padding-left:15px;
+				border-left:1px dashed #545454;
+				margin-left:5px;
+				margin-bottom:5px;
+			}
+
+			.treeList:before {
+				content : "";
+				position: absolute;
+				left    : 0;
+				bottom  : 0;
+				height  : 1px;
+				width   : 20px;
+				border-bottom:1px dashed #545454;
+			}
+
+			.rootList {
+				font-family:Arial;
+				font-size:14px;
+				list-style-type:none;
+				clear:both;
+				padding-left:15px;
+			}
+
+			.treeLabel {
+				height:20px;
+			}
+
+			.resultSVG {
+				
+			}
+		</style>
+		<script src='js/mousetrap.min.js'></script>
+		<script src="js/socket.io-1.3.4.js"></script>
+		<script src="js/react-with-addons.js"></script>
+		<script src="js/JSXTransformer.js"></script>
+		<script src="js/d3.v3.min.js"></script>
+	</head>
+	<body>
+		<div id="input"></div>
+		<div id="result">
+		<div id='resultTree'></div>
+		<div id='resultVis'>
+			<div id='resultDiv'></div>
+				<div className='svgContainer'><svg id='db' class='resultSVG'></div>
+			</svg>
+				<div className='svgContainer'><svg id='sbj' class='resultSVG'></div>
+			</svg>
+		</div>
+		</div>
+		<script type="text/jsx" src="test.jsx"></script>
+	</body>
+</html>
+            

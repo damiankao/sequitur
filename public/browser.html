@@ -1,0 +1,113 @@
+<html>
+  <head>
+    <title>Sequitur genome browser</title>
+    <script type="text/javascript" src="js/d3.v3.min.js"></script>
+    <script type="text/javascript" src="js/crossfilter.min.js"></script>
+    <script type="text/javascript" src="js/mousetrap.min.js"></script>
+    <script type="text/javascript" src="js/sequitur.js"></script>
+    <script src="js/react-with-addons.js"></script>
+    <script src="js/JSXTransformer.js"></script>
+    <script src="js/socket.io-1.3.4.js"></script>
+    <style>
+      body {
+        margin:0px;
+        overflow:hidden;
+        font-family:arial;
+      }
+
+      .sidePanel {
+        background:#31343B;
+        color:white;
+        overflow:hidden;
+        position:absolute;
+      }
+
+      .titlePanel {
+        padding:10px;
+        text-align:center;    
+        background:#DB7332;
+        color:white;
+        height:20px;
+        font-size:16px;
+        letter-spacing:5px;
+        font-family:verdana;
+      }
+
+      .titlePanel:hover {
+        cursor:pointer;
+      }
+
+      .subtitlePanel {
+        padding:10px;
+        text-align:center;    
+        font-weight:bold;  
+        color:#ABB7D1;
+        height:15px;
+        font-size:12px;
+        letter-spacing:3px;
+      }
+
+      .trackInfo {
+        margin-bottom:10px;
+        padding:8px;
+        padding-left:25px;
+        color:white;
+      }
+
+      .trackInfo:hover {
+        background:#383C45;
+        cursor:move;
+      }
+
+      .tracksubInfo {
+        font-size:13px;
+        color:#B8C5E3;
+      }
+
+      .trackColorbox {
+        font-weight:bold;
+        padding-top:6px;
+        font-size:11px;
+        color:#BAC8E8;
+        text-align:center;
+      }
+
+      .trackColorbox:hover {
+        cursor:pointer;
+      }
+
+      .feat_tupleKey {
+        font-size:12px;
+        color:#B5C5EB;
+        letter-spacing:1px;
+        margin-bottom:3px;
+        font-weight:bold;
+        margin-left:10px;
+      }
+
+      .feat_tupleValue{
+        font-size:14px;
+        margin-left:15px;
+      }
+
+      .feat_table {
+        color:white;
+        font-size:11px;
+        margin-left:15px;
+      }
+
+      td {
+        padding:5 10 5 10px;
+      }
+
+      .feat_info {
+        margin-bottom:10px;
+        margin-right:10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id='sidePanel'></div>
+    <script type="text/jsx" src="browser.jsx"></script>
+  </body>
+</html>
