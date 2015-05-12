@@ -70,8 +70,10 @@ else:
 	config['start_port'] = str(int(config['start_port']) + 1)
 	cmd_blast = "blast {} -c {} -b {} -t {} -j {}".format(config['start_port'], os.path.abspath(configPath), os.path.abspath(config['blast_bin']), config['blast_threadsPerJob'], config['blast_jobsMax'])
 	config['start_port'] = str(int(config['start_port']) + 1)
+	cmd_seq = "seq {} -d {} -i {}".format(config['start_port'], config["seq_db"], config["seq_index"])
+	config['start_port'] = str(int(config['start_port']) + 1)	
 
-	cmds = [cmd_static, cmd_sparseRef, cmd_feature, cmd_blast]
+	cmds = [cmd_static, cmd_sparseRef, cmd_feature, cmd_blast, cmd_seq]
 
 	if action == 'start':
 		if int(config['static_port']) < 130:

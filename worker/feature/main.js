@@ -37,8 +37,8 @@ var io = function(socket) {
 
         	socket.emit('feat',{'data':buffer.toString('utf-8'),'status':'success'});
         } else {
-		socket.emit('feat',{'status':'failed','error':data.featName + ' not found'});
-	}
+		    socket.emit('feat',{'status':'failed','error':data.featName + ' not found'});
+	    }
     });
 }
 

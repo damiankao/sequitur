@@ -3,6 +3,7 @@ var App = React.createClass({
         return {
             'selectedTab':'blast', //blast, results, browser, help
             'result':[],
+            'sequence':'',
             //browser states
             'browser_ref':'initRef',
             'browser_newRef':'',
@@ -313,6 +314,7 @@ var App = React.createClass({
     /////////////////
 
     render: function() {
+        //blast content
         var targetRows = [];
         for (var i = 0 ; i < this.state.blast_dbs.length ; i ++ ) {
             var s = this.state.blast_dbs[i];
@@ -334,42 +336,6 @@ var App = React.createClass({
                 </div>);
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         var blastResults = [];
         if (this.state.blast_queries.length == 0) {
             blastResults = (
@@ -388,18 +354,17 @@ var App = React.createClass({
                     var qlen = query.children[0].children[0].data.qlen;
                     var spineScale = d3.scale.linear()
                         .domain([1, qlen])
-                        .range([1, dim[0] - this.state.blast_width - 500]);
+                        .range([1, dim[0] - this.state.blast_width - 400]);
 
                     var sbjs = [];
-
+                    
                     for (var a = 0 ; a < query.children.length ; a ++ ) {
                         var subject = query.children[a];
                         var hspQCoords = [];
+                        var hspEvals = [];
                         var hspSCoords = [];
                         var minEval = 1;
                         var maxEval = 0;
-
-                        var hspRows = [];
 
                         for (var b = 0 ; b < subject.children.length ; b ++ ) {
                             var hsp = subject.children[b];
@@ -411,14 +376,7 @@ var App = React.createClass({
                             hspQCoords.push(qCoord);
                             hspSCoords.push(sCoord);
                             allCoords.push(qCoord);
-
-                            if (subject.collapse == false) {
-                                
-
-
-
-
-                            }
+                            hspEvals.push(hsp.data.evalue);
                         }
 
                         var unionQCoords = seeker.util.unionCoords(seeker.util.stableSortCoords(hspQCoords));
@@ -434,31 +392,49 @@ var App = React.createClass({
                             pathString += 'M ' + spineScale(qCoord[0]) + ',2 L ' + spineScale(qCoord[1]) + ',2 '
                         }
 
-                        var spineHTML = '<svg class=spineSVG style="width:' + spineScale(qlen) + '"><path stroke="#636363" stroke-width=4 d="' + pathString + '"/></svg>'
                         var color = a % 2 == 0 ? '#E8E8E8' : '#C4C4C4';
 
                         sbjs.push(
                                 <tr style={{'background':color}}>
                                     <td className={'blastFirstColumn'}>{subject.name} <div onClick={this.blast_goToRef.bind(this, subject.name, unionSStart, unionSEnd)} className={'blastRefName'}>(view in browser)</div></td>
-                                    <td>{subject.children.length} <div onClick={this.blast_toggleHSP.bind(this, subject)} className={'blastRefName'}>(show HSPs)</div></td>
+                                    <td>{subject.children.length} <div onClick={this.blast_toggleHSP.bind(this, subject)} className={'blastRefName'}>({subject.collapse ? "show HSPs" : "hide HSPs"})</div></td>
                                     <td>{queryCov} ({Math.round(queryCov / qlen * 100)}%)</td>
                                     <td>{minEval}</td>
                                     <td>{maxEval}</td>
                                 </tr>
                             )
-                        sbjs.push(
-                                <tr style={{'background':color}}>
-                                    <td className={'blastFirstColumn'} style={{'font-size':10,'text-align':'right'}}>Tiled HSP</td>
-                                    <td colSpan={'4'} dangerouslySetInnerHTML={{__html: spineHTML}}>
-                                    </td>
-                                </tr>
-                                )
+
+                        sbjs.push(<tr style={{'background':color}}>
+                                        <td className={'blastFirstColumn'} style={{'font-size':10,'text-align':'right'}}>Tiled HSP</td>
+                                        <td colSpan={'4'}>
+                                            <svg className={"spineSVG"} style={{'width':spineScale(qlen)}}>
+                                                <path d={pathString} stroke={'#636363'} strokeWidth={'3'}></path>
+                                            </svg>
+                                        </td>
+                                    </tr>);
+
+                        if (!subject.collapse) {
+                            for (var x = 0 ; x < hspQCoords.length ; x ++ ) {
+                                var qCoord = hspQCoords[x];
+                                var hspPathString = 'M ' + spineScale(qCoord[0]) + ',2 L ' + spineScale(qCoord[1]) + ',2 '
+
+                                sbjs.push(<tr style={{'background':color}}>
+                                            <td className={'blastFirstColumn'} style={{'font-size':10,'text-align':'right'}}>e-value: {hspEvals[x]}</td>
+                                            <td colSpan={'4'}>
+                                                <svg className={"spineSVG"} style={{'width':spineScale(qlen)}}>
+                                                    <path d={hspPathString} stroke={'#636363'} strokeWidth={'3'}></path>
+                                                </svg>
+                                            </td>
+                                        </tr>);
+                            }
+                        }
                     }
 
                     var allUnionCoords = seeker.util.unionCoords(seeker.util.stableSortCoords(allCoords));
                     
                     queries.push(<div>
                             <table className={'blastTable'} style={{'width':dim[0] - this.state.blast_width - 60}}>
+                                <tbody>
                                 <tr style={{'font-size':'16px'}}>
                                     <td className={'blastFirstColumn'} style={{'font-weight':'bold','font-size':'16px'}}>{query.name}</td>
                                     <td colSpan={'2'}>
@@ -482,6 +458,7 @@ var App = React.createClass({
                                     <td>maximum e-value</td>
                                 </tr>
                                 {sbjs}
+                                </tbody>
                             </table>
                         </div>)
                 } else {
@@ -526,11 +503,9 @@ var App = React.createClass({
                 </div>
             );
 
-
-
+        //brower content
         var browserContent;
-        var helpContent;
-
+        
         jsBrowser
             .whxy_delta(dim[0] - this.state.browser_width,dim[1] - this.state.menuHeight, this.state.browser_width, this.state.menuHeight)
 
@@ -584,9 +559,19 @@ var App = React.createClass({
             )
         } else {
             var info = [];
+            /*
+            var jsObj = jsBrowser.data().featIndex[this.state.browser_selected];
+            var extractCoords = [];
+            for (var c = 0 ; c < jsObj.coords.length ; c ++ ) {
+                var coord = jsObj.coords[c];
+                extractCoords.push([coord[0] + jsObj.start, coord[0] + jsObj.start + coord[1]]);
+            }
 
+            seqSocket.emit('seq',{'seqName':jsObj.ref,'coords':extractCoords})
+            */
             for (var i = 0 ; i < this.state.browser_feature.length ; i ++ ) {
                 var featInfo = this.state.browser_feature[i];
+                //different info types
                 if (featInfo[1] == 'tuple') {
                     info.push(<div className={'feat_info'}>
                             <div className={'feat_tupleKey'}>{featInfo[0]}</div>
@@ -615,6 +600,10 @@ var App = React.createClass({
                             </div>
                         )
 
+                } else if (featInfo[1] == 'sequence') {
+
+                } else if (featInfo[1] == 'linkout') {
+                    
                 }
             }
 
@@ -629,6 +618,8 @@ var App = React.createClass({
                 </div>
             )
         }
+
+        var helpContent;
 
         return (
                 <div>
@@ -738,7 +729,7 @@ refSocket.on('result', function(res) {
 
         seeker.util.formatRef(refObj);
 
-        jsBrowser.init(refObj, res.window.length > 0 ? res.window : [refObj.length * 0.3, refObj.length * 0.6]);
+        jsBrowser.init(refObj, res.window.length > 0 ? res.window : [refObj.length * 0.3, refObj.length * 0.3 + 50000]);
 
         if (!initialized) {
             app = React.render(
@@ -782,7 +773,7 @@ sparseSocket.on('feat', function(d) {
     if (d.status == 'success') {
         var featObj = [];
         var data = d.data.split('>');
-        var featName = data[0];
+        var featName = data[0].trim();
         for (var i = 1 ; i < data.length ; i ++ ) {
             var meta = data[i].trim().split('\n');
             var key = meta[0].split('\t');
@@ -793,6 +784,11 @@ sparseSocket.on('feat', function(d) {
     } else {
         console.log(d.error);
     }
+})
+
+var seqSocket = io('http://148.251.54.48:8883/');
+seqSocket.on('result', function(d) {
+    console.log(d.data);
 })
 
 jsBrowser.hook_featureClick = function(featName) {

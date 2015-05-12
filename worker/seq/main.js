@@ -29,11 +29,26 @@ var server = function(req, res) {
 var io = function(socket) {
     socket.on('seq', function (data) {
         var offset = index[data.seqName];
+        var coords = data.coords;
 
         var buffer = new Buffer(offset[1]);
-        fs.readSync(fd, buffer, 0, offset[1],offset[0])
+        fs.readSync(fd, buffer, 0, offset[1],offset[0]);
+        var seq = buffer.toString('utf-8');
+        var formatted = '';
+        if (coords.length == 0) {
+            formatted = seq;
+        } else {
+            for (var i = 0 ; i < coords.length ; i++ ) {
+                var coord = coords[i];
+                if (coord[1] > seq.length) {
+                    coord[1] = seq.length;
+                }
 
-        socket.emit('result',{'data':buffer.toString('utf-8'),'log':'success'})
+                formatted += seq.substring(coord[0] - 1, coord[1]);
+            }
+        }
+
+        socket.emit('result',{'data':formatted,'log':'success'})
     });
 }
 

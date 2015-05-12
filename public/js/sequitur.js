@@ -978,7 +978,9 @@
 
 		base._repts = function() {
 			var coords = [];
-			for (var i = 0 ; i < _refObj.feats.length ; i ++ ) {
+			var featsNum = Math.min(_refObj.feats.length,200);
+
+			for (var i = 0 ; i < featsNum ; i ++ ) {
 				var feat = _refObj.feats[i];
 				for (var a = 0 ; a < feat.coords.length ; a ++ ) {
 					var coord = feat.coords[a];
@@ -991,6 +993,7 @@
 
 			var current = 0;
 		    var pts = [];
+
 		    for (var i = 0 ; i < coords.length ; i ++ ) {
 		    	var coord = coords[i];
 		    	if (coord[1] == 's') {
@@ -1126,7 +1129,6 @@
 			})
 
 			_feats = _refObj.dim_start.bottom(Infinity);
-
 			return base;
 		}
 
